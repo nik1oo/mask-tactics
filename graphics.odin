@@ -7,6 +7,7 @@ import os "core:os/os2"
 Color:: raylib.Color
 Rect:: raylib.Rectangle
 Texture:: raylib.Texture
+Camera:: raylib.Camera2D
 Sprite:: struct {
 	texture: Texture }
 BLANK: Color : raylib.BLANK
@@ -45,8 +46,8 @@ g_draw_sprite :: proc(name: string, rect: Rect, tint: Color = raylib.WHITE) {
 	source_rect := raylib.Rectangle { 0, 0, f32(sprite.texture.width), f32(sprite.texture.height) }
 	raylib.DrawTexturePro(sprite.texture, source_rect, rect, { 0, 0 }, 0.0, tint) }
 
-g_draw_texture :: proc(texture: Texture, rect: Rect, tint: Color = raylib.WHITE) {
-	source_rect := raylib.Rectangle { 0, 0, f32(texture.width), f32(texture.height) }
+g_draw_texture :: proc(texture: Texture, rect: Rect, tint: Color = raylib.WHITE, flip_x: bool = false, flip_y: bool = false) {
+	source_rect := raylib.Rectangle { 0, 0, f32(texture.width), flip_y ? (- f32(texture.height)) : f32(texture.height) }
 	raylib.DrawTexturePro(texture, source_rect, rect, { 0, 0 }, 0.0, tint) }
 
 g_load_render_texture :: proc(size: [2]f32) -> Render_Texture {
@@ -64,3 +65,8 @@ g_begin_frame :: proc() {
 g_end_frame :: proc() {
 	raylib.EndDrawing() }
 
+g_begin_camera :: proc() {
+	raylib.BeginMode2D(state.camera) }
+
+g_end_camera :: proc() {
+	raylib.EndMode2D() }
