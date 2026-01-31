@@ -11,7 +11,6 @@ a_load_sound :: proc(name: string) {
 	sound: Sound
 	filepath, error: = os.join_path({ "./assets", name }, context.temp_allocator)
 	assert(error == nil)
-	fmt.println("Loading", filepath)
 	fmt.assertf(os.exists(filepath), "File not found: %s", filepath)
 	sound.sound = raylib.LoadSound(strings.clone_to_cstring(filepath))
 	state.sounds[name] = sound }
