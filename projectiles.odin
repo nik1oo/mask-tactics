@@ -32,7 +32,7 @@ p_draw_projectile :: proc(projectile: Projectile) {
 	rotation: = - linalg.vector_angle_between([2]f32{ 1.0, 0.0 }, projectile.direction)
 	// rotation = vec_angle(projectile.direction)
 	rect: Rect = { projectile.pos.x, projectile.pos.y, projectile_class.size.x, projectile_class.size.y }
-	g_draw_sprite(projectile_class.sprite_name, rect, center_offset = true, rotation = rotation) }
+	g_draw_sprite(projectile_class.sprite_name, rect, offset_ratio = { 0.5, 0.5 }, rotation = rotation) }
 
 p_spawn_projectile :: proc(class: string, pos: [2]f32, direction: [2]f32) {
 	projectile: Projectile = {

@@ -16,11 +16,11 @@ m_init :: proc() {
 	m_new_mask_class("Aztec 1", Mask_Class{
 		sprite_name = "mask-aztec-1-test.png",
 		size = { 2, 2 },
-		origin = { 0, 0 } })
+		origin = { 0, 1 } })
 	m_new_mask_class("Aztec 2", Mask_Class{
 		sprite_name = "mask-aztec-2-test.png",
 		size = { 2, 2 },
-		origin = { 1, 1 } })
+		origin = { 1, 0 } })
 	m_new_mask_class("Aztec 3", Mask_Class{
 		sprite_name = "mask-aztec-3-test.png",
 		size = { 3, 1 },
@@ -42,6 +42,10 @@ m_draw_mask :: proc(mask: Mask) {
 	rect := m_mask_rect(mask.pos, mask_class)
 	g_draw_sprite(mask_class.sprite_name, rect) }
 
-m_mask_rect :: proc(origin: [2]f32, class: Mask_Class) -> Rect {
+m_mask_rect :: proc(pos: [2]f32, class: Mask_Class) -> Rect {
 	size: [2]f32 = MASK_SCALE_INVENTORY * [2]f32{ auto_cast class.size.x, auto_cast class.size.y }
-	return { origin.x - size.x / 2, origin.y - size.y / 2, size.x, size.y } }
+	tile_size: [2]f32 = { size.x / f32(class.size.x), size.y / f32(class.size.y) }
+	offset: [2]f32 = { tile_size.x / 2, tile_size.y / 2 }
+	// offset: [2]f32 = { size.x / f32(class.size.x) * class.origin.x, size.y / f32(class.size.y) * class.origin.y }
+	// class.origin
+	return { pos.x - offset.x, pos.y - offset.y, size.x, size.y } }

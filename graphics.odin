@@ -48,15 +48,15 @@ g_load_sprite :: proc(name: string) {
 	sprite.texture = raylib.LoadTexture(strings.clone_to_cstring(filepath))
 	state.sprites[name] = sprite }
 
-g_draw_sprite :: proc(name: string, rect: Rect, tint: Color = raylib.WHITE, flip_x: bool = false, flip_y: bool = false, rotation: f32 = 0.0, center_offset: bool = false) {
+g_draw_sprite :: proc(name: string, rect: Rect, tint: Color = raylib.WHITE, flip_x: bool = false, flip_y: bool = false, rotation: f32 = 0.0, offset_ratio: [2]f32 = { 0.0, 0.0 }) {
 	fmt.assertf(name in state.sprites, "Sprite %s not found.", name)
 	sprite := state.sprites[name]
-	g_draw_texture(sprite.texture, rect, tint, flip_x, flip_y, rotation, center_offset) }
+	g_draw_texture(sprite.texture, rect, tint, flip_x, flip_y, rotation, offset_ratio) }
 
 
-g_draw_texture :: proc(texture: Texture, rect: Rect, tint: Color = raylib.WHITE, flip_x: bool = false, flip_y: bool = false, rotation: f32 = 0.0, center_offset: bool = false) {
+g_draw_texture :: proc(texture: Texture, rect: Rect, tint: Color = raylib.WHITE, flip_x: bool = false, flip_y: bool = false, rotation: f32 = 0.0, offset_ratio: [2]f32 = { 0.0, 0.0 }) {
 	source_rect := raylib.Rectangle { 0, 0, f32(texture.width), flip_y ? (- f32(texture.height)) : f32(texture.height) }
-	offset: [2]f32 = center_offset ? { rect.width / 2, rect.height / 2 } : { 0, 0 }
+	offset: [2]f32 = offset_ratio * { rect.width, rect.height }
 	raylib.DrawTexturePro(texture, source_rect, rect, offset, linalg.to_degrees(rotation), tint)
 	raylib.DrawCircle(auto_cast (rect.x), auto_cast (rect.y), 1.0, raylib.RED) }
 

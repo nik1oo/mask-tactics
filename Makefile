@@ -1,2 +1,2 @@
 main:
-	odin run . -debug
+	odin build . -debug -out:"Mask Tactics.exe"
