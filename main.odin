@@ -15,11 +15,16 @@ import "core:time"
 
 NAME: string : "Mask Tactics"
 DEFAULT_RESOLUTION: [2]f32 : { 1792, 1008 }
+DEFAULT_WALKING_SPEED:: 200.0
 FPS:: 120
 DELTA: f32 : 1.0 / cast(f32)FPS
 STARTING_GRID_SIZE: [2]int : { 4, 4 }
 PROPS_CAP: int : 100
-WORLD_SIZE: [2]f32 : { 800, 800 }
+PROJECTILES_CAP: int : 10000
+WORLD_SIZE: [2]f32 : { 10000, 10000 }
+HEALTHBAR_MARGIN: f32 : 16.0
+HEALTHBAR_SIZE: [2]f32 : { 64, 1 }
+MASK_SCALE_INVENTORY :: 64.0
 
 State :: struct {
 	target_fps: f32,
@@ -42,7 +47,15 @@ State :: struct {
 	world_rect: Rect,
 	player_pos: [2]f32,
 	stats: Stats,
-	level: Level }
+	level: Level,
+	enemy_classes: map[string]Enemy_Class,
+	projectile_classes: map[string]Projectile_Class,
+	game_timer: Timer,
+	game_time: f32,
+	aim_direction: [2]f32,
+	playarea_center: [2]f32,
+	mouse_pos: [2]f32,
+	mask_classes: map[string]Mask_Class }
 state: ^State
 
 init :: proc() {
@@ -57,6 +70,11 @@ init :: proc() {
 	g_load_sprite("prop-tree-test.png")
 	g_load_sprite("knight-test.png")
 	g_load_sprite("archer-test.png")
+	g_load_sprite("horseman-test.png")
+	g_load_sprite("arrow-test.png")
+	g_load_sprite("mask-aztec-1-test.png")
+	g_load_sprite("mask-aztec-2-test.png")
+	g_load_sprite("mask-aztec-3-test.png")
 	// raylib.PlaySound(music_sound)
 	state.grid_size = STARTING_GRID_SIZE
 	state.screen_rect = u_screen_rect()
@@ -74,8 +92,11 @@ init :: proc() {
 	state.camera = { zoom = 1.0 }
 	state.world_rect = Rect{ 0, 0, WORLD_SIZE.x, WORLD_SIZE.y }
 	state.player_pos = { WORLD_SIZE.x / 2, WORLD_SIZE.y / 2 }
+	p_init()
 	e_init()
-	l_generate_new() }
+	m_init()
+	l_generate_new()
+	start_timer(&state.game_timer) }
 
 shutdown :: proc() {
 	raylib.CloseAudioDevice()
@@ -90,27 +111,38 @@ main :: proc() {
 	shutdown() }
 
 update :: proc() {
+	state.game_time = read_timer(&state.game_timer)
 	g_begin_frame()
 	g_clear_render_texture(state.playarea_texture)
 	c_update()
+	l_update()
 // prototype.png
 	// ...
 	g_draw_sprite("prototype.png", state.screen_rect)
-	g_draw_rect(state.screen_rect, BLUE)
-	g_draw_rect(state.rect_inventory, BLACK)
-	g_draw_rect(state.rect_mask, BLUE)
-	g_draw_rect(state.rect_timer, BLACK)
-	// g_draw_rect(state.rect_playarea, BLACK)
-	for i in 0 ..< len(state.rect_mask_grid) do for j in 0 ..< len(state.rect_mask_grid[0]) do g_draw_rect(state.rect_mask_grid[i][j], BLACK)
 	u_begin_playarea()
 		state.camera.target = state.player_pos
 		state.camera.offset = [2]f32{ state.playarea_size.x, state.playarea_size.y } / 2
 		g_begin_camera()
-		g_draw_rect(state.world_rect, GREEN)
+		g_draw_rect(state.world_rect, Color{ 50, 50, 50, 255 })
+		for enemy in state.level.enemies do e_draw_enemy(enemy)
 		e_draw_player()
-		e_draw_enemy(.ARCHER, { 100, 100 })
+		for projectile in state.level.projectiles do p_draw_projectile(projectile)
+		// p_draw_projectile(Projectile{
+		// 	class = "Arrow",
+		// 	pos = { state.player_pos.x + 200.0, state.player_pos.y },
+		// 	direction = linalg.normalize([2]f32{ 2, -1 })
+		// 	// direction = { math.cos(2 * state.game_time), math.sin(2 * state.game_time) }
+		// 	})
 		g_end_camera()
 	u_end_playarea()
+	g_draw_rect(state.screen_rect, BLUE)
+	g_draw_rect(state.rect_mask, BLUE)
+	g_draw_rect(state.rect_timer, BLACK)
+	// g_draw_rect(state.rect_playarea, BLACK)
 	g_draw_texture(state.playarea_texture.texture, state.rect_playarea, flip_y = true)
+	u_mask_grid()
+	u_inventory()
+	pos := state.playarea_center + 100 * state.aim_direction
+	raylib.DrawCircle(auto_cast (pos.x), auto_cast (pos.y), 4.0, raylib.GREEN)
 	g_end_frame()
 	free_all(context.temp_allocator) }

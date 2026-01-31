@@ -8,4 +8,4 @@ Stats :: struct {
 	walking_speed: f32 }
 
 s_init :: proc() {
-	state.stats.walking_speed = 400.0 }
+	state.stats.walking_speed = DEFAULT_WALKING_SPEED }

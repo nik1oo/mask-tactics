@@ -62,3 +62,19 @@ u_begin_playarea :: proc() {
 u_end_playarea :: proc() {
 	raylib.EndBlendMode()
 	raylib.EndTextureMode() }
+
+u_mask_grid :: proc() {
+	for i in 0 ..< len(state.rect_mask_grid) do for j in 0 ..< len(state.rect_mask_grid[0]) {
+		rect := state.rect_mask_grid[i][j]
+		hovered := u_hover_rect(rect)
+		g_draw_rect(rect, hovered ? RED : BLACK) } }
+
+// The inventory contains items you are holding.
+u_inventory :: proc() {
+	mask_class := state.mask_classes["Aztec 1"]
+	hovered := u_hover_rect(state.rect_inventory)
+	g_draw_rect(state.rect_inventory, hovered ? RED : BLACK)
+	m_draw_mask(Mask{ class_name = "Aztec 1", pos = state.mouse_pos, in_inventory = true }) }
+
+u_hover_rect :: proc(rect: Rect) -> bool {
+	return raylib.CheckCollisionPointRec(state.mouse_pos, rect) }
