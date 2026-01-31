@@ -8,6 +8,7 @@ import "core:math/linalg"
 c_update :: proc() {
 	state.playarea_center = rect_center(state.rect_playarea)
 	state.mouse_pos = raylib.GetMousePosition()
+	state.mouse_delta = raylib.GetMouseDelta()
 	state.aim_direction = linalg.normalize(state.mouse_pos - state.playarea_center)
 	speed := state.stats.walking_speed
 	if raylib.IsKeyDown(.A) do state.player_pos.x -= DELTA * speed

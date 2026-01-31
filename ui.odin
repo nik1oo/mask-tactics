@@ -51,6 +51,15 @@ u_rect_grid :: proc(rect_in: Rect, size: [2]int) -> (rects_out: [][]Rect) {
 u_screen_rect :: proc() -> Rect {
 	return Rect{ 0.0, 0.0, state.resolution.x, state.resolution.y } }
 
+u_rect_rotate :: proc(rect_in: Rect) -> (rect_out: Rect) {
+	center := rect_center(rect_in)
+	rect_out = Rect{
+		x = center.x - rect_in.height / 2,
+		y = center.y - rect_in.width / 2,
+		width = rect_in.height,
+		height = rect_in.width }
+	return rect_out }
+
 u_grid :: proc(mask_rect: Rect) {
 
 	// grid_size
@@ -68,22 +77,65 @@ u_mask_grid :: proc() {
 	for i in 0 ..< len(state.rect_mask_grid) do for j in 0 ..< len(state.rect_mask_grid[0]) {
 		rect := state.rect_mask_grid[i][j]
 		hovered := u_hover_rect(rect)
+		if state.grabbed_mask_class != "" do for point, i in state.grabbed_mask_points {
+			if state.grabbed_mask_shape[i] == 1 do if u_point_inside_rect(rect, point) do hovered = true }
 		g_draw_rect(rect, hovered ? RED : BLACK) } }
 
 // The inventory contains items you are holding.
 u_inventory :: proc() {
 	hovered := u_hover_rect(state.rect_inventory)
 	g_draw_rect(state.rect_inventory, hovered ? RED : BLACK)
-	fmt.println(len(state.level.masks))
+	some_grabbed: bool = false
 	for _, i in state.level.masks {
 		mask := &state.level.masks[i]
-		if raylib.GetMouseWheelMove() < 0.0 do mask.rotation = (mask.rotation + 1) % 4
-		if raylib.GetMouseWheelMove() > 0.0 do mask.rotation = (mask.rotation - 1) % 4
 		mask_class := state.mask_classes[mask.class_name]
-		rect := m_mask_rect(mask.pos, mask_class)
-		if u_hover_rect(rect) do rect = u_rect_margins(rect, -8.0)
-		m_draw_mask(mask^, rect) }
-}
+		scale: f32
+		switch {
+		case mask.grabbed: scale = state.mask_scale_grid
+		case mask.in_inventory:
+			scale = MASK_SCALE_INVENTORY
+		case: scale = MASK_SCALE_FREE }
+		rect := m_mask_rect(mask.pos, mask_class, scale)
+		hover_rect: Rect = rect
+		hover_rect.x = rect.x - rect.width / 2
+		hover_rect.y = rect.y - rect.height / 2
+		if abs(mask.rotation) % 2 == 1 do hover_rect = u_rect_rotate(hover_rect)
+		if mask.grabbed do mask.pos += state.mouse_delta
+		if u_hover_rect(hover_rect) && (! some_grabbed) {
+			if raylib.IsMouseButtonPressed(.LEFT) {
+				mask.grabbed = true
+				state.grabbed_mask_points = make([][2]f32, len(mask_class.shape))
+				state.grabbed_mask_shape = mask_class.shape
+				state.grabbed_mask_class = mask.class_name } }
+		m_draw_mask(mask^, rect)
+		// g_draw_rect_lines(hover_rect, RED)
+		if mask.grabbed {
+			some_grabbed = true
+			for _, i in 0 ..< mask_class.size.x do for _, j in 0 ..< mask_class.size.y {
+				point_index: int = m_mask_point_index(i, j, mask_class.size)
+				state.grabbed_mask_points[point_index] = mask.pos + { 0.5 - 0.5 * cast(f32)mask_class.size.x + cast(f32)i, 0.5 - 0.5 * cast(f32)mask_class.size.y + cast(f32)j } * scale
+				if mask_class.shape[point_index] == 1 do g_draw_point(state.grabbed_mask_points[len(state.grabbed_mask_points) - 1], raylib.RED) }
+			if raylib.IsMouseButtonReleased(.LEFT) {
+				if u_point_inside_rect(state.rect_inventory, mask.pos) {
+					mask.in_inventory = true }
+				else {
+					mask.in_inventory = false
+					// size = { 2, 2 },
+					// shape = slice.clone([]u8{
+					// 	1, 0,
+					// 	1, 1 }) })
+					// for _, i in 0 ..< mask_class.size.x do for _, j in 0 ..< mask_class.size.y {
+					// 	g_draw_point(mask.pos + { 0.5 * cast(f32)i, 0.5 * cast(f32)j } * state.mask_scale_grid, BLUE)
+				}
+				mask.grabbed = false
+				state.grabbed_mask_class = "" }
+			// (TODO): Why does this cause a bug?
+			// delete(state.grabbed_mask_points)
+			if raylib.GetMouseWheelMove() < 0.0 do mask.rotation = (mask.rotation + 1) % 4
+			if raylib.GetMouseWheelMove() > 0.0 do mask.rotation = (mask.rotation - 1) % 4 } } }
 
 u_hover_rect :: proc(rect: Rect) -> bool {
 	return raylib.CheckCollisionPointRec(state.mouse_pos, rect) }
+
+u_point_inside_rect :: proc(rect: Rect, point: [2]f32) -> bool {
+	return raylib.CheckCollisionPointRec(point, rect) }

@@ -34,6 +34,12 @@ g_draw_rect :: proc(rect: Rect, color: Color) -> Rect {
 	raylib.DrawRectangleRec(rect, color)
 	return rect }
 
+g_draw_point :: proc(point: [2]f32, color: Color) {
+	raylib.DrawCircle(auto_cast (point.x), auto_cast (point.y), 2.0, color) }
+
+g_draw_rect_lines :: proc(rect: Rect, color: Color) {
+	raylib.DrawRectangleLinesEx(rect, 2.0, color) }
+
 g_draw_bar :: proc(rect: Rect, color: Color, ratio: f32) -> Rect {
 	rect_left, _ := u_rect_split_h(rect, ratio, 0.0)
 	g_draw_rect(rect, BLACK)

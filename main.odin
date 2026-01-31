@@ -24,7 +24,8 @@ PROJECTILES_CAP: int : 10000
 WORLD_SIZE: [2]f32 : { 10000, 10000 }
 HEALTHBAR_MARGIN: f32 : 16.0
 HEALTHBAR_SIZE: [2]f32 : { 64, 1 }
-MASK_SCALE_INVENTORY :: 64.0
+MASK_SCALE_INVENTORY :: 48.0
+MASK_SCALE_FREE :: 128.0
 INVENTORY_MASKS_CAP :: 16
 
 State :: struct {
@@ -36,6 +37,7 @@ State :: struct {
 	sprites: map[string]Sprite,
 	grid_size: [2]int,
 	playarea_size: [2]f32,
+	mask_scale_grid: f32,
 	playarea_texture: Render_Texture,
 	screen_rect: Rect,
 	rect_inventory: Rect,
@@ -56,7 +58,11 @@ State :: struct {
 	aim_direction: [2]f32,
 	playarea_center: [2]f32,
 	mouse_pos: [2]f32,
-	mask_classes: map[string]Mask_Class }
+	mouse_delta: [2]f32,
+	mask_classes: map[string]Mask_Class,
+	grabbed_mask_class: string,
+	grabbed_mask_points: [][2]f32,
+	grabbed_mask_shape: []u8 }
 state: ^State
 
 init :: proc() {
@@ -66,7 +72,7 @@ init :: proc() {
 	g_create_window(DEFAULT_RESOLUTION, FPS, state.name)
 	state.sounds = make(map[string]Sound)
 	a_load_sound("music.mp3")
-	a_play_sound_once("music.mp3")
+	// a_play_sound_once("music.mp3")
 	g_load_sprite("prototype.png")
 	g_load_sprite("terrain.png")
 	g_load_sprite("prop-tree-test.png")
@@ -118,6 +124,7 @@ update :: proc() {
 	g_clear_render_texture(state.playarea_texture)
 	c_update()
 	l_update()
+	state.mask_scale_grid = state.rect_mask.width / cast(f32)state.grid_size.x
 // prototype.png
 	// ...
 	g_draw_sprite("prototype.png", state.screen_rect)
