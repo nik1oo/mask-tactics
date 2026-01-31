@@ -8,7 +8,8 @@ import "core:math/rand"
 Level :: struct {
 	props: [dynamic]Prop,
 	enemies: [dynamic]Enemy,
-	projectiles: [dynamic]Projectile }
+	projectiles: [dynamic]Projectile,
+	masks: [dynamic]Mask }
 
 // spawns behind
 
@@ -23,7 +24,12 @@ l_generate_new :: proc() {
 		enemy := &state.level.enemies[i]
 		enemy.health = rand.float32_range(0.0, state.enemy_classes[enemy.class_name].max_health) }
 	delete(state.level.projectiles)
-	state.level.projectiles = make_dynamic_array_len_cap([dynamic]Projectile, 0, PROJECTILES_CAP) }
+	state.level.projectiles = make_dynamic_array_len_cap([dynamic]Projectile, 0, PROJECTILES_CAP)
+	state.level.masks = make_dynamic_array_len_cap([dynamic]Mask, 0, INVENTORY_MASKS_CAP)
+	append(&state.level.masks, Mask{ class_name = "Aztec 1", pos = { 300, 400 }, in_inventory = true })
+	append(&state.level.masks, Mask{ class_name = "Aztec 2", pos = { 600, 400 }, in_inventory = true })
+	append(&state.level.masks, Mask{ class_name = "Aztec 3", pos = { 900, 400 }, in_inventory = true })
+}
 
 l_random_points :: proc(rect: Rect, count: int) -> (points: [][2]f32) {
 	points = make([][2]f32, count)

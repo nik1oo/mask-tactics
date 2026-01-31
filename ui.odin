@@ -1,4 +1,5 @@
 package mask_tactics
+import "core:fmt"
 import "vendor:raylib"
 
 // prototype.png
@@ -71,10 +72,18 @@ u_mask_grid :: proc() {
 
 // The inventory contains items you are holding.
 u_inventory :: proc() {
-	mask_class := state.mask_classes["Aztec 1"]
 	hovered := u_hover_rect(state.rect_inventory)
 	g_draw_rect(state.rect_inventory, hovered ? RED : BLACK)
-	m_draw_mask(Mask{ class_name = "Aztec 1", pos = state.mouse_pos, in_inventory = true }) }
+	fmt.println(len(state.level.masks))
+	for _, i in state.level.masks {
+		mask := &state.level.masks[i]
+		if raylib.GetMouseWheelMove() < 0.0 do mask.rotation = (mask.rotation + 1) % 4
+		if raylib.GetMouseWheelMove() > 0.0 do mask.rotation = (mask.rotation - 1) % 4
+		mask_class := state.mask_classes[mask.class_name]
+		rect := m_mask_rect(mask.pos, mask_class)
+		if u_hover_rect(rect) do rect = u_rect_margins(rect, -8.0)
+		m_draw_mask(mask^, rect) }
+}
 
 u_hover_rect :: proc(rect: Rect) -> bool {
 	return raylib.CheckCollisionPointRec(state.mouse_pos, rect) }

@@ -25,6 +25,7 @@ WORLD_SIZE: [2]f32 : { 10000, 10000 }
 HEALTHBAR_MARGIN: f32 : 16.0
 HEALTHBAR_SIZE: [2]f32 : { 64, 1 }
 MASK_SCALE_INVENTORY :: 64.0
+INVENTORY_MASKS_CAP :: 16
 
 State :: struct {
 	target_fps: f32,
@@ -67,6 +68,7 @@ init :: proc() {
 	a_load_sound("music.mp3")
 	a_play_sound_once("music.mp3")
 	g_load_sprite("prototype.png")
+	g_load_sprite("terrain.png")
 	g_load_sprite("prop-tree-test.png")
 	g_load_sprite("knight-test.png")
 	g_load_sprite("archer-test.png")
@@ -123,7 +125,8 @@ update :: proc() {
 		state.camera.target = state.player_pos
 		state.camera.offset = [2]f32{ state.playarea_size.x, state.playarea_size.y } / 2
 		g_begin_camera()
-		g_draw_rect(state.world_rect, Color{ 50, 50, 50, 255 })
+		// g_draw_rect(state.world_rect, Color{ 50, 50, 50, 255 })
+		g_draw_sprite("terrain.png", state.world_rect)
 		for enemy in state.level.enemies do e_draw_enemy(enemy)
 		e_draw_player()
 		for projectile in state.level.projectiles do p_draw_projectile(projectile)

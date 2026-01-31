@@ -1,4 +1,5 @@
 package mask_tactics
+import "core:math"
 import "core:fmt"
 
 Mask_Class :: struct {
@@ -9,7 +10,8 @@ Mask_Class :: struct {
 Mask :: struct {
 	class_name: string,
 	pos: [2]f32,
-	in_inventory: bool }
+	in_inventory: bool,
+	rotation: int }
 
 m_init :: proc() {
 	state.mask_classes = make(map[string]Mask_Class)
@@ -37,15 +39,14 @@ m_new_mask :: proc(class_name: string) {
 	// TODO
 }
 
-m_draw_mask :: proc(mask: Mask) {
+m_draw_mask :: proc(mask: Mask, rect: Rect) {
 	mask_class := state.mask_classes[mask.class_name]
-	rect := m_mask_rect(mask.pos, mask_class)
-	g_draw_sprite(mask_class.sprite_name, rect) }
+	g_draw_sprite(mask_class.sprite_name, rect, rotation = 0.5 * cast(f32)mask.rotation * math.PI, offset_ratio = { (1.0 / cast(f32)mask_class.size.x) * (0.5 + cast(f32)mask_class.origin.x), (1.0 / cast(f32)mask_class.size.y) * (0.5 + cast(f32)mask_class.origin.y) }) }
 
-m_mask_rect :: proc(pos: [2]f32, class: Mask_Class) -> Rect {
+m_mask_rect :: proc(pos: [2]f32, class: Mask_Class) -> (rect: Rect) {
 	size: [2]f32 = MASK_SCALE_INVENTORY * [2]f32{ auto_cast class.size.x, auto_cast class.size.y }
 	tile_size: [2]f32 = { size.x / f32(class.size.x), size.y / f32(class.size.y) }
-	offset: [2]f32 = { tile_size.x / 2, tile_size.y / 2 }
+	offset: [2]f32 = { tile_size.x * (0.5 + cast(f32)class.origin.x), tile_size.y * (0.5 + cast(f32)class.origin.y) }
 	// offset: [2]f32 = { size.x / f32(class.size.x) * class.origin.x, size.y / f32(class.size.y) * class.origin.y }
 	// class.origin
 	return { pos.x - offset.x, pos.y - offset.y, size.x, size.y } }
