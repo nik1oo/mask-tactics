@@ -63,8 +63,8 @@ e_new_prop_class :: proc(name: string, sprite_name: string) {
 
 e_init :: proc() {
 	state.enemy_classes = make(map[string]Enemy_Class)
-	e_new_enemy_class("Archer", Enemy_Class{
-		max_health = 200,
+	e_new_enemy_class("Knight", Enemy_Class{
+		max_health = 50,
 		movement_speed = 100,
 		spawns_behind_player = false,
 		agility = 100.0,
@@ -89,7 +89,7 @@ e_draw_character :: proc(sprite_left: string, sprite_right: string, direction: D
 e_draw_enemy :: proc(enemy: Enemy) {
 	health_ratio: f32 = enemy.health / state.enemy_classes[enemy.class_name].max_health
 	switch enemy.class_name {
-	case "Archer": e_draw_character("archer-test.png", "archer-test.png", enemy.direction, enemy.pos, health_ratio)
+	case "Knight": e_draw_character("knight-left.png", "knight-right.png", enemy.direction, enemy.pos, health_ratio)
 	case "Horseman": e_draw_character("horseman-test.png", "horseman-test.png", enemy.direction, enemy.pos, health_ratio) } }
 
 e_get_enemy_class :: proc(enemy: Enemy) -> Enemy_Class {

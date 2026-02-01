@@ -21,17 +21,18 @@ DELTA: f32 : 1.0 / cast(f32)FPS
 STARTING_GRID_SIZE: [2]int : { 4, 4 }
 PROPS_CAP: int : 100
 PROJECTILES_CAP: int : 10000
-WORLD_SIZE: [2]f32 : { 5000, 5000 }
+WORLD_SIZE: [2]f32 : { 4000, 4000 }
 HEALTHBAR_MARGIN: f32 : 16.0
 HEALTHBAR_SIZE: [2]f32 : { 64, 2 }
 MASK_SCALE_INVENTORY :: 48.0
 MASK_SCALE_FREE :: 128.0
 INVENTORY_MASKS_CAP :: 16
-CHARACTER_SIZE_BASIC: [2]f32 : { 64, 64 }
+CHARACTER_SIZE_BASIC: [2]f32 : { 70, 100 }
 PLAYER_VOICE_INTERVAL_RANGE: [2]f32 : { 4.0, 10.0 }
 PLAYER_MAX_HEALTH_DEFAULT: f32 : 500
-WAVE_SPAWN_RADIUS: f32 : 500.0
-WAVE_SIZE: int: 8
+WAVE_SPAWN_RADIUS: f32 : 1000.0
+WAVE_SIZE: int: 16
+WAVE_INTERVAL: f32 : 4.0
 
 State :: struct {
 	target_fps: f32,
@@ -91,7 +92,8 @@ init :: proc() {
 	// g_load_sprite("terrain-displacement.png")
 	g_load_sprite("prop-tree-test.png")
 	g_load_sprite("knight-test.png")
-	g_load_sprite("archer-test.png")
+	g_load_sprite("knight-right.png")
+	g_load_sprite("knight-left.png")
 	g_load_sprite("horseman-test.png")
 	g_load_sprite("arrow-test.png")
 	g_load_sprite("mask_01.png")
