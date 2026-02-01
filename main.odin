@@ -34,6 +34,7 @@ WAVE_SPAWN_RADIUS: f32 : 1000.0
 WAVE_SIZE: int: 16
 WAVE_INTERVAL: f32 : 8.0
 BASE_ATTACK_INTERVAL: f32 : 0.1
+MASK_DROP_SIZE: [2]f32 : { 32, 32 }
 
 State :: struct {
 	target_fps: f32,
@@ -74,7 +75,8 @@ State :: struct {
 	player_voice_interval: f32,
 	player_direction: Direction,
 	player_health: f32,
-	player_max_health: f32 }
+	player_max_health: f32,
+	score: int }
 state: ^State
 
 init :: proc() {
@@ -144,6 +146,7 @@ update :: proc() {
 	g_clear_render_texture(state.playarea_texture)
 	c_update()
 	l_update()
+	m_mask_effects()
 	a_update_player_voice()
 	state.mask_scale_grid = state.rect_mask.width / cast(f32)state.grid_size.x
 // prototype.png
@@ -155,6 +158,7 @@ update :: proc() {
 		// g_draw_rect(state.world_rect, Color{ 50, 50, 50, 255 })
 		g_draw_sprite("terrain.png", state.world_rect)
 		for enemy in state.level.enemies do e_draw_enemy(enemy)
+		for mask_drop in state.level.mask_drops do m_draw_mask_drop(mask_drop)
 		e_draw_player()
 		for projectile in state.level.projectiles do p_draw_projectile(projectile)
 		// p_draw_projectile(Projectile{

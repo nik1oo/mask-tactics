@@ -12,7 +12,11 @@ Level :: struct {
 	enemies: [dynamic]Enemy,
 	projectiles: [dynamic]Projectile,
 	masks: [dynamic]Mask,
-	wave_timer: Timer }
+	wave_timer: Timer,
+	mask_drops: [dynamic]Mask_Drop }
+
+l_drop_mask :: proc(mask_drop: Mask_Drop) {
+	append(&state.level.mask_drops, mask_drop) }
 
 // spawns behind
 
@@ -27,13 +31,14 @@ l_generate_new :: proc() {
 	delete(state.level.projectiles)
 	state.level.projectiles = make_dynamic_array_len_cap([dynamic]Projectile, 0, PROJECTILES_CAP)
 	state.level.masks = make_dynamic_array_len_cap([dynamic]Mask, 0, INVENTORY_MASKS_CAP)
-	append(&state.level.masks, Mask{ class_name = "Aztec 1", pos = { 200, 150 }, in_inventory = true })
-	append(&state.level.masks, Mask{ class_name = "Aztec 2", pos = { 400, 150 }, in_inventory = true })
-	append(&state.level.masks, Mask{ class_name = "Aztec 3", pos = { 600, 150 }, in_inventory = true })
+	// append(&state.level.masks, Mask{ class_name = "Aztec 1", pos = { 200, 150 }, in_inventory = true })
+	// append(&state.level.masks, Mask{ class_name = "Aztec 2", pos = { 400, 150 }, in_inventory = true })
+	// append(&state.level.masks, Mask{ class_name = "Aztec 3", pos = { 600, 150 }, in_inventory = true })
 	state.player_max_health = PLAYER_MAX_HEALTH_DEFAULT
 	state.player_health = state.player_max_health
 	l_spawn_wave()
-	start_timer(&state.level.wave_timer) }
+	start_timer(&state.level.wave_timer)
+	state.score = 0 }
 
 l_random_points :: proc(rect: Rect, count: int) -> (points: [][2]f32) {
 	points = make([][2]f32, count)
@@ -56,11 +61,23 @@ l_update :: proc() {
 		if p_update_projectile(i) do i -= 1 }
 	for i := 0; i < len(state.level.enemies); i += 1 {
 		if state.level.enemies[i].health == 0 {
+			// if rand.float32_range(0, 1.0) < 0.1 {
+				l_drop_mask(Mask_Drop{ fmt.aprintf("Aztec %d", 1 + rand.int31_max(3)), state.level.enemies[i].pos })
+			// }
 			ordered_remove(&state.level.enemies, i)
+			state.score += 100
 			i -= 1 } }
 	if read_timer(&state.level.wave_timer) > WAVE_INTERVAL {
 		l_spawn_wave()
-		restart_timer(&state.level.wave_timer) } }
+		restart_timer(&state.level.wave_timer) }
+	for i := 0; i < len(state.level.mask_drops); i += 1 {
+		if u_point_inside_rect(u_rect_around_point(state.level.mask_drops[i].pos, 2 * MASK_DROP_SIZE), state.player_pos) {
+			append(&state.level.masks, Mask{ class_name = state.level.mask_drops[i].class_name, pos = { 200, 150 }, in_inventory = true })
+			start_timer(&state.level.masks[len(state.level.masks) - 1].timer)
+			ordered_remove(&state.level.mask_drops, i)
+			i -= 1 }
+	}
+}
 
 l_spawn_wave :: proc() {
 	for i in 0 ..< WAVE_SIZE {

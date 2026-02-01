@@ -1,6 +1,7 @@
 package mask_tactics
 import "core:fmt"
 import "vendor:raylib"
+import "core:strings"
 
 // prototype.png
 
@@ -86,6 +87,7 @@ u_inventory :: proc() {
 	hovered := u_hover_rect(state.rect_inventory)
 	g_draw_rect_lines(state.rect_inventory, hovered ? YELLOW : BLACK)
 	some_grabbed: bool = false
+	raylib.DrawText(fmt.ctprintf("Score: %d", state.score), 790, 870, 40, YELLOW)
 	for _, i in state.level.masks {
 		mask := &state.level.masks[i]
 		mask_class := state.mask_classes[mask.class_name]
@@ -111,6 +113,7 @@ u_inventory :: proc() {
 		m_draw_mask(mask^, rect)
 		// g_draw_rect_lines(hover_rect, RED)
 		if mask.grabbed {
+			raylib.DrawText(strings.clone_to_cstring(mask_class.description), 790, 120, 20, YELLOW)
 			some_grabbed = true
 			for _, i in 0 ..< mask_class.size.x do for _, j in 0 ..< mask_class.size.y {
 				point_index: int = m_mask_point_index(i, j, mask_class.size)
@@ -128,6 +131,8 @@ u_inventory :: proc() {
 					// for _, i in 0 ..< mask_class.size.x do for _, j in 0 ..< mask_class.size.y {
 					// 	g_draw_point(mask.pos + { 0.5 * cast(f32)i, 0.5 * cast(f32)j } * state.mask_scale_grid, BLUE)
 				}
+				if u_point_inside_rect(state.rect_mask, mask.pos) {
+					mask.in_grid = true }
 				mask.grabbed = false
 				state.grabbed_mask_class = "" }
 			// (TODO): Why does this cause a bug?
