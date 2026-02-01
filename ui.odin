@@ -79,12 +79,12 @@ u_mask_grid :: proc() {
 		hovered := u_hover_rect(rect)
 		if state.grabbed_mask_class != "" do for point, i in state.grabbed_mask_points {
 			if state.grabbed_mask_shape[i] == 1 do if u_point_inside_rect(rect, point) do hovered = true }
-		g_draw_rect(rect, hovered ? RED : BLACK) } }
+		g_draw_rect_lines(rect, hovered ? YELLOW : BLACK) } }
 
 // The inventory contains items you are holding.
 u_inventory :: proc() {
 	hovered := u_hover_rect(state.rect_inventory)
-	g_draw_rect(state.rect_inventory, hovered ? RED : BLACK)
+	g_draw_rect_lines(state.rect_inventory, hovered ? YELLOW : BLACK)
 	some_grabbed: bool = false
 	for _, i in state.level.masks {
 		mask := &state.level.masks[i]
@@ -139,3 +139,6 @@ u_hover_rect :: proc(rect: Rect) -> bool {
 
 u_point_inside_rect :: proc(rect: Rect, point: [2]f32) -> bool {
 	return raylib.CheckCollisionPointRec(point, rect) }
+
+u_rect_around_point :: proc(point: [2]f32, size: [2]f32) -> Rect {
+	return Rect{ point.x - size.x / 2, point.y - size.y / 2, size.x, size.y } }

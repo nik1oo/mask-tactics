@@ -21,12 +21,13 @@ DELTA: f32 : 1.0 / cast(f32)FPS
 STARTING_GRID_SIZE: [2]int : { 4, 4 }
 PROPS_CAP: int : 100
 PROJECTILES_CAP: int : 10000
-WORLD_SIZE: [2]f32 : { 10000, 10000 }
+WORLD_SIZE: [2]f32 : { 5000, 5000 }
 HEALTHBAR_MARGIN: f32 : 16.0
 HEALTHBAR_SIZE: [2]f32 : { 64, 1 }
 MASK_SCALE_INVENTORY :: 48.0
 MASK_SCALE_FREE :: 128.0
 INVENTORY_MASKS_CAP :: 16
+CHARACTER_SIZE_BASIC: [2]f32 : { 64, 64 }
 
 State :: struct {
 	target_fps: f32,
@@ -73,8 +74,10 @@ init :: proc() {
 	state.sounds = make(map[string]Sound)
 	a_load_sound("music.mp3")
 	// a_play_sound_once("music.mp3")
+	g_load_sprite("UI_screen.png")
 	g_load_sprite("prototype.png")
 	g_load_sprite("terrain.png")
+	// g_load_sprite("terrain-displacement.png")
 	g_load_sprite("prop-tree-test.png")
 	g_load_sprite("knight-test.png")
 	g_load_sprite("archer-test.png")
@@ -127,7 +130,6 @@ update :: proc() {
 	state.mask_scale_grid = state.rect_mask.width / cast(f32)state.grid_size.x
 // prototype.png
 	// ...
-	g_draw_sprite("prototype.png", state.screen_rect)
 	u_begin_playarea()
 		state.camera.target = state.player_pos
 		state.camera.offset = [2]f32{ state.playarea_size.x, state.playarea_size.y } / 2
@@ -145,11 +147,11 @@ update :: proc() {
 		// 	})
 		g_end_camera()
 	u_end_playarea()
-	g_draw_rect(state.screen_rect, BLUE)
-	g_draw_rect(state.rect_mask, BLUE)
+	g_draw_texture(state.playarea_texture.texture, state.rect_playarea, flip_y = true)
+	g_draw_sprite("UI_screen.png", state.screen_rect)
+	g_draw_rect_lines(state.rect_mask, BLACK)
 	g_draw_rect(state.rect_timer, BLACK)
 	// g_draw_rect(state.rect_playarea, BLACK)
-	g_draw_texture(state.playarea_texture.texture, state.rect_playarea, flip_y = true)
 	u_mask_grid()
 	u_inventory()
 	pos := state.playarea_center + 100 * state.aim_direction
