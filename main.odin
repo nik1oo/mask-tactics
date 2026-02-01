@@ -66,7 +66,8 @@ State :: struct {
 	grabbed_mask_points: [][2]f32,
 	grabbed_mask_shape: []u8,
 	player_voice_timer: Timer,
-	player_voice_interval: f32 }
+	player_voice_interval: f32,
+	player_direction: Direction }
 state: ^State
 
 init :: proc() {
@@ -91,6 +92,8 @@ init :: proc() {
 	g_load_sprite("mask_01.png")
 	g_load_sprite("mask_02.png")
 	g_load_sprite("mask_03.png")
+	g_load_sprite("mage-left.png")
+	g_load_sprite("mage-right.png")
 	// raylib.PlaySound(music_sound)
 	state.grid_size = STARTING_GRID_SIZE
 	state.screen_rect = u_screen_rect()
