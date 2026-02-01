@@ -23,12 +23,13 @@ PROPS_CAP: int : 100
 PROJECTILES_CAP: int : 10000
 WORLD_SIZE: [2]f32 : { 5000, 5000 }
 HEALTHBAR_MARGIN: f32 : 16.0
-HEALTHBAR_SIZE: [2]f32 : { 64, 1 }
+HEALTHBAR_SIZE: [2]f32 : { 64, 2 }
 MASK_SCALE_INVENTORY :: 48.0
 MASK_SCALE_FREE :: 128.0
 INVENTORY_MASKS_CAP :: 16
 CHARACTER_SIZE_BASIC: [2]f32 : { 64, 64 }
 PLAYER_VOICE_INTERVAL_RANGE: [2]f32 : { 4.0, 10.0 }
+PLAYER_MAX_HEALTH_DEFAULT: f32 : 500
 
 State :: struct {
 	target_fps: f32,
@@ -67,7 +68,9 @@ State :: struct {
 	grabbed_mask_shape: []u8,
 	player_voice_timer: Timer,
 	player_voice_interval: f32,
-	player_direction: Direction }
+	player_direction: Direction,
+	player_health: f32,
+	player_max_health: f32 }
 state: ^State
 
 init :: proc() {
