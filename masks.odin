@@ -6,7 +6,8 @@ import "core:slice"
 Mask_Class :: struct {
 	sprite_name: string,
 	size: [2]int,
-	shape: []u8 }
+	shape: []u8,
+	description: string }
 
 Mask :: struct {
 	class_name: string,
@@ -20,22 +21,25 @@ Mask :: struct {
 m_init :: proc() {
 	state.mask_classes = make(map[string]Mask_Class)
 	m_new_mask_class("Aztec 1", Mask_Class{
-		sprite_name = "mask-aztec-1-test.png",
+		sprite_name = "mask_01.png",
 		size = { 2, 2 },
 		shape = slice.clone([]u8{
 			1, 0,
-			1, 1 }) })
+			1, 1 }),
+		description = "Shoots arrows at enemies." })
 	m_new_mask_class("Aztec 2", Mask_Class{
-		sprite_name = "mask-aztec-2-test.png",
+		sprite_name = "mask_02.png",
 		size = { 2, 2 },
 		shape = slice.clone([]u8{
 			1, 1,
-			0, 1 }) })
+			0, 1 }),
+		description = "?" })
 	m_new_mask_class("Aztec 3", Mask_Class{
-		sprite_name = "mask-aztec-3-test.png",
+		sprite_name = "mask_03.png",
 		size = { 3, 1 },
 		shape = slice.clone([]u8{
-			1, 1, 1 }) })
+			1, 1, 1 }),
+		description = "?" })
 	m_new_mask("Aztec 1") }
 
 m_new_mask_class :: proc(name: string, mask_class: Mask_Class) {

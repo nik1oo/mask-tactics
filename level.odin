@@ -48,4 +48,10 @@ l_random_points :: proc(rect: Rect, count: int) -> (points: [][2]f32) {
 
 l_update :: proc() {
 	for _, i in state.level.enemies do e_update_enemy(&state.level.enemies[i])
-	for _, i in state.level.projectiles do p_update_projectile(&state.level.projectiles[i]) }
+	for i := 0; i < len(state.level.projectiles); i += 1 {
+		if p_update_projectile(i) do i -= 1 }
+	for i := 0; i < len(state.level.enemies); i += 1 {
+		if state.level.enemies[i].health == 0 {
+			ordered_remove(&state.level.enemies, i)
+			i -= 1 } } }
+

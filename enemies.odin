@@ -59,7 +59,7 @@ e_new_prop_class :: proc(name: string, sprite_name: string) {
 e_init :: proc() {
 	state.enemy_classes = make(map[string]Enemy_Class)
 	e_new_enemy_class("Archer", Enemy_Class{
-		max_health = 20,
+		max_health = 200,
 		movement_speed = 100,
 		spawns_behind_player = false,
 		agility = 100.0,
@@ -75,7 +75,7 @@ e_draw_player :: proc() {
 	e_draw_character("knight-test.png", state.player_pos) }
 
 e_draw_character :: proc(sprite_name: string, pos: [2]f32, health_ratio: f32 = 1.0) {
-	size: [2]f32 = { 64, 64 }
+	size: [2]f32 = CHARACTER_SIZE_BASIC
 	g_draw_sprite(sprite_name, Rect{ pos.x - size.x / 2, pos.y - size.y / 2, size.x, size.y })
 	healthbar_rect: = Rect{ pos.x - size.x / 2, pos.y - size.y / 2 - HEALTHBAR_MARGIN, HEALTHBAR_SIZE.x, HEALTHBAR_SIZE.y }
 	g_draw_bar(healthbar_rect, RED, health_ratio) }
@@ -112,3 +112,9 @@ e_update_enemy :: proc(enemy: ^Enemy) {
 	direction: [2]f32 = {}
 	if enemy.move_target != enemy.pos do direction = linalg.normalize(enemy.move_target - enemy.pos)
 	enemy.pos += DELTA * direction * enemy_class.movement_speed }
+
+e_damage_enemy :: proc(index: int, damage: f32) {
+	enemy := &state.level.enemies[index]
+	enemy.health = max(0, enemy.health - damage)
+	// fmt.println("damaging enemy", enemy.health + damage, enemy.health)
+}
