@@ -35,7 +35,8 @@ g_draw_rect :: proc(rect: Rect, color: Color) -> Rect {
 	return rect }
 
 g_draw_point :: proc(point: [2]f32, color: Color) {
-	raylib.DrawCircle(auto_cast (point.x), auto_cast (point.y), 2.0, color) }
+	// raylib.DrawCircle(auto_cast (point.x), auto_cast (point.y), 2.0, color)
+}
 
 g_draw_rect_lines :: proc(rect: Rect, color: Color) {
 	raylib.DrawRectangleLinesEx(rect, 2.0, color) }
@@ -64,7 +65,8 @@ g_draw_texture :: proc(texture: Texture, rect: Rect, tint: Color = raylib.WHITE,
 	source_rect := raylib.Rectangle { 0, 0, f32(texture.width), flip_y ? (- f32(texture.height)) : f32(texture.height) }
 	offset: [2]f32 = offset_ratio * { rect.width, rect.height }
 	raylib.DrawTexturePro(texture, source_rect, rect, offset, linalg.to_degrees(rotation), tint)
-	raylib.DrawCircle(auto_cast (rect.x), auto_cast (rect.y), 1.0, raylib.RED) }
+	// raylib.DrawCircle(auto_cast (rect.x), auto_cast (rect.y), 1.0, raylib.RED)
+}
 
 g_load_render_texture :: proc(size: [2]f32) -> Render_Texture {
 	return raylib.LoadRenderTexture(auto_cast size.x, auto_cast size.y) }

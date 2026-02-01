@@ -124,3 +124,8 @@ e_damage_enemy :: proc(index: int, damage: f32) {
 	enemy.health = max(0, enemy.health - damage)
 	// fmt.println("damaging enemy", enemy.health + damage, enemy.health)
 }
+
+e_spawn_enemy :: proc(class: string, point: [2]f32) {
+	append(&state.level.enemies, e_new_enemy(class, point))
+	enemy := &state.level.enemies[len(state.level.enemies) - 1]
+	enemy.health = state.enemy_classes[enemy.class_name].max_health }

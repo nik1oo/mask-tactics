@@ -30,6 +30,8 @@ INVENTORY_MASKS_CAP :: 16
 CHARACTER_SIZE_BASIC: [2]f32 : { 64, 64 }
 PLAYER_VOICE_INTERVAL_RANGE: [2]f32 : { 4.0, 10.0 }
 PLAYER_MAX_HEALTH_DEFAULT: f32 : 500
+WAVE_SPAWN_RADIUS: f32 : 500.0
+WAVE_SIZE: int: 8
 
 State :: struct {
 	target_fps: f32,
@@ -167,6 +169,6 @@ update :: proc() {
 	u_mask_grid()
 	u_inventory()
 	pos := state.playarea_center + 100 * state.aim_direction
-	raylib.DrawCircle(auto_cast (pos.x), auto_cast (pos.y), 4.0, raylib.GREEN)
+	// raylib.DrawCircle(auto_cast (pos.x), auto_cast (pos.y), 4.0, raylib.GREEN)
 	g_end_frame()
 	free_all(context.temp_allocator) }
