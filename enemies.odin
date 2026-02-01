@@ -21,7 +21,12 @@ Enemy :: struct {
 	state: Enemy_State,
 	state_timer: Timer,
 	auxiliary_timer: Timer,
-	evade_direction: i8 }
+	evade_direction: i8,
+	direction: Direction }
+
+Direction :: enum {
+	LEFT,
+	RIGHT }
 
 Enemy_State :: enum {
 	STANDING,
@@ -72,19 +77,20 @@ e_draw_player :: proc() {
 	// pos: [2]f32 = state.player_pos
 	// size: [2]f32 = { 64, 64 }
 	// g_draw_sprite("knight-test.png", Rect{ pos.x - size.x / 2, pos.y - size.y / 2, size.x, size.y })
-	e_draw_character("knight-test.png", state.player_pos) }
+	e_draw_character("mage-left.png", "mage-right.png", state.player_direction, state.player_pos, state.player_health / state.player_max_health) }
 
-e_draw_character :: proc(sprite_name: string, pos: [2]f32, health_ratio: f32 = 1.0) {
+e_draw_character :: proc(sprite_left: string, sprite_right: string, direction: Direction, pos: [2]f32, health_ratio: f32 = 1.0) {
 	size: [2]f32 = CHARACTER_SIZE_BASIC
+	sprite_name: string = (direction == .LEFT) ? sprite_left : sprite_right
 	g_draw_sprite(sprite_name, Rect{ pos.x - size.x / 2, pos.y - size.y / 2, size.x, size.y })
 	healthbar_rect: = Rect{ pos.x - size.x / 2, pos.y - size.y / 2 - HEALTHBAR_MARGIN, HEALTHBAR_SIZE.x, HEALTHBAR_SIZE.y }
-	g_draw_bar(healthbar_rect, RED, health_ratio) }
+	if health_ratio < 1.0 do g_draw_bar(healthbar_rect, RED, health_ratio) }
 
 e_draw_enemy :: proc(enemy: Enemy) {
 	health_ratio: f32 = enemy.health / state.enemy_classes[enemy.class_name].max_health
 	switch enemy.class_name {
-	case "Archer": e_draw_character("archer-test.png", enemy.pos, health_ratio)
-	case "Horseman": e_draw_character("horseman-test.png", enemy.pos, health_ratio) } }
+	case "Archer": e_draw_character("archer-test.png", "archer-test.png", enemy.direction, enemy.pos, health_ratio)
+	case "Horseman": e_draw_character("horseman-test.png", "horseman-test.png", enemy.direction, enemy.pos, health_ratio) } }
 
 e_get_enemy_class :: proc(enemy: Enemy) -> Enemy_Class {
 	return state.enemy_classes[enemy.class_name] }
