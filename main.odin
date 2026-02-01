@@ -28,6 +28,7 @@ MASK_SCALE_INVENTORY :: 48.0
 MASK_SCALE_FREE :: 128.0
 INVENTORY_MASKS_CAP :: 16
 CHARACTER_SIZE_BASIC: [2]f32 : { 64, 64 }
+PLAYER_VOICE_INTERVAL_RANGE: [2]f32 : { 4.0, 10.0 }
 
 State :: struct {
 	target_fps: f32,
@@ -63,7 +64,9 @@ State :: struct {
 	mask_classes: map[string]Mask_Class,
 	grabbed_mask_class: string,
 	grabbed_mask_points: [][2]f32,
-	grabbed_mask_shape: []u8 }
+	grabbed_mask_shape: []u8,
+	player_voice_timer: Timer,
+	player_voice_interval: f32 }
 state: ^State
 
 init :: proc() {
@@ -73,6 +76,9 @@ init :: proc() {
 	g_create_window(DEFAULT_RESOLUTION, FPS, state.name)
 	state.sounds = make(map[string]Sound)
 	a_load_sound("sfx-arrow.wav")
+	a_load_sound("sfx-player-1.wav")
+	a_load_sound("sfx-player-2.wav")
+	a_load_sound("sfx-player-3.wav")
 	g_load_sprite("UI_screen.png")
 	g_load_sprite("prototype.png")
 	g_load_sprite("terrain.png")
@@ -126,6 +132,7 @@ update :: proc() {
 	g_clear_render_texture(state.playarea_texture)
 	c_update()
 	l_update()
+	a_update_player_voice()
 	state.mask_scale_grid = state.rect_mask.width / cast(f32)state.grid_size.x
 // prototype.png
 	// ...
