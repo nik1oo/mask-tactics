@@ -94,7 +94,8 @@ u_inventory :: proc() {
 		case mask.grabbed: scale = state.mask_scale_grid
 		case mask.in_inventory:
 			scale = MASK_SCALE_INVENTORY
-		case: scale = MASK_SCALE_FREE }
+		case: scale = MASK_SCALE_FREE
+			scale = state.mask_scale_grid }
 		rect := m_mask_rect(mask.pos, mask_class, scale)
 		hover_rect: Rect = rect
 		hover_rect.x = rect.x - rect.width / 2
