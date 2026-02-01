@@ -22,7 +22,8 @@ Enemy :: struct {
 	state_timer: Timer,
 	auxiliary_timer: Timer,
 	evade_direction: i8,
-	direction: Direction }
+	direction: Direction,
+	attack_timer: Timer }
 
 Direction :: enum {
 	LEFT,
@@ -90,7 +91,10 @@ e_draw_enemy :: proc(enemy: Enemy) {
 	health_ratio: f32 = enemy.health / state.enemy_classes[enemy.class_name].max_health
 	switch enemy.class_name {
 	case "Knight": e_draw_character("knight-left.png", "knight-right.png", enemy.direction, enemy.pos, health_ratio)
-	case "Horseman": e_draw_character("horseman-test.png", "horseman-test.png", enemy.direction, enemy.pos, health_ratio) } }
+	case "Horseman": e_draw_character("horseman-test.png", "horseman-test.png", enemy.direction, enemy.pos, health_ratio) }
+
+	// "sword-test.png"
+}
 
 e_get_enemy_class :: proc(enemy: Enemy) -> Enemy_Class {
 	return state.enemy_classes[enemy.class_name] }
@@ -100,6 +104,11 @@ e_update_enemy :: proc(enemy: ^Enemy) {
 	switch enemy.state {
 	case .STANDING:
 		enemy.move_target = enemy.pos
+		// HERE
+		if read_timer(&enemy.attack_timer) > 2.0 {
+			p_spawn_projectile("Sword", enemy.pos + { 0, - CHARACTER_SIZE_BASIC.y / 2 }, linalg.normalize(state.player_pos - enemy.pos), shot_by_player = false)
+			restart_timer(&enemy.attack_timer)
+		}
 	case .CHASING:
 		enemy.move_target = state.player_pos
 	case .EVADING:
@@ -121,11 +130,13 @@ e_update_enemy :: proc(enemy: ^Enemy) {
 
 e_damage_enemy :: proc(index: int, damage: f32) {
 	enemy := &state.level.enemies[index]
-	enemy.health = max(0, enemy.health - damage)
-	// fmt.println("damaging enemy", enemy.health + damage, enemy.health)
-}
+	enemy.health = max(0, enemy.health - damage) }
+
+e_damage_player :: proc(damage: f32) {
+	state.player_health = max(0, state.player_health - damage) }
 
 e_spawn_enemy :: proc(class: string, point: [2]f32) {
 	append(&state.level.enemies, e_new_enemy(class, point))
 	enemy := &state.level.enemies[len(state.level.enemies) - 1]
-	enemy.health = state.enemy_classes[enemy.class_name].max_health }
+	enemy.health = state.enemy_classes[enemy.class_name].max_health
+	start_timer(&enemy.attack_timer) }

@@ -17,6 +17,7 @@ Level :: struct {
 // spawns behind
 
 l_generate_new :: proc() {
+	state.level = {}
 	delete(state.level.props)
 	state.level.props = make_dynamic_array_len_cap([dynamic]Prop, 0, PROPS_CAP)
 	// (TODO): Spawn random trees within the "world_rect".

@@ -32,7 +32,8 @@ PLAYER_VOICE_INTERVAL_RANGE: [2]f32 : { 4.0, 10.0 }
 PLAYER_MAX_HEALTH_DEFAULT: f32 : 500
 WAVE_SPAWN_RADIUS: f32 : 1000.0
 WAVE_SIZE: int: 16
-WAVE_INTERVAL: f32 : 4.0
+WAVE_INTERVAL: f32 : 8.0
+BASE_ATTACK_INTERVAL: f32 : 0.1
 
 State :: struct {
 	target_fps: f32,
@@ -96,6 +97,7 @@ init :: proc() {
 	g_load_sprite("knight-left.png")
 	g_load_sprite("horseman-test.png")
 	g_load_sprite("arrow-test.png")
+	g_load_sprite("sword-test.png")
 	g_load_sprite("mask_01.png")
 	g_load_sprite("mask_02.png")
 	g_load_sprite("mask_03.png")
@@ -172,5 +174,6 @@ update :: proc() {
 	u_inventory()
 	pos := state.playarea_center + 100 * state.aim_direction
 	// raylib.DrawCircle(auto_cast (pos.x), auto_cast (pos.y), 4.0, raylib.GREEN)
+	if state.player_health <= 0 do l_generate_new()
 	g_end_frame()
 	free_all(context.temp_allocator) }
